@@ -46,6 +46,9 @@ public class AccessTokenDTo {
     public void setState(String state) {
         this.state = state;
     }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 4ba834baa28fd1150e9063787fd239eab911e2da
 }

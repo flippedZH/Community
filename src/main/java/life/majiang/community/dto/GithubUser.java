@@ -28,6 +28,7 @@ public class GithubUser {
     public void setBio(String bio) {
         this.bio = bio;
     }
+<<<<<<< HEAD
 
     @Override
     public String toString() {
@@ -37,5 +38,7 @@ public class GithubUser {
                 ", bio='" + bio + '\'' +
                 '}';
     }
+=======
+>>>>>>> 4ba834baa28fd1150e9063787fd239eab911e2da
 }
 
