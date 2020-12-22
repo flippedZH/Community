@@ -75,7 +75,7 @@ public class AuthorizeController {
 
 
             //请求
-            request.getSession().setAttribute("user",githubUser);
+            //request.getSession().setAttribute("user",githubUser);
             return "redirect:/";
 
 
