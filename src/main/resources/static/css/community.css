@@ -9,3 +9,8 @@ body {
     float: right;
     margin: 15px;
 }
+
+.alert-box{
+    width: 50px;
+    background-color: red;
+}

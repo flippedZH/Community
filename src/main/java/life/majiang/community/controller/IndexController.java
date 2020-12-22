@@ -23,12 +23,15 @@ public class IndexController {
     public  String index(HttpServletRequest request){
         Cookie[] cookies=request.getCookies();
         for(Cookie cookie:cookies){
-            String token=cookie.getValue();
-            User user=userMapper.findByToken(token);
-            if(user!=null){
-                request.getSession().setAttribute("user",user);
+            if(cookie.getName().equals("token")){
+                String token=cookie.getValue();
+                User user=userMapper.findByToken(token);
+                if(user!=null){
+                    //数据给前端口
+                    request.getSession().setAttribute("user",user);
+                }
+                break;
             }
-            break;
         }
         return "index";//从模板目录里面找的（templaes）
     }

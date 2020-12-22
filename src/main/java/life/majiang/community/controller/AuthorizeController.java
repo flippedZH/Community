@@ -44,8 +44,6 @@ public class AuthorizeController {
                             HttpServletRequest request,
                             HttpServletResponse response){
         //调用github access tocken接口
-        System.out.println("code:"+code);
-        System.out.println("state"+state);
 
         //设置五个参数
         AccessTokenDTo accessTokenDTo = new AccessTokenDTo();
@@ -58,9 +56,10 @@ public class AuthorizeController {
 
         String accessToken=githubProvider.getAccessToken(accessTokenDTo);
         GithubUser githubUser=githubProvider.getUser(accessToken);
-        if(githubUser!=null){
+        if(githubUser!=null && githubUser.getId()!=null){
             //登录成功 写cookies 和 session
 
+            System.out.println("name:"+githubUser.getName());
             User user = new User();
             String token = UUID.randomUUID().toString();
             user.setToken(token);
@@ -68,14 +67,15 @@ public class AuthorizeController {
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtModified());
-            userMapper.insert(user);
+            userMapper.insert(user);//写入数据库
 
             //响应
             response.addCookie(new Cookie("token",token));
 
-
             //请求
             //request.getSession().setAttribute("user",githubUser);
+//            System.out.println("username:"+user.getName());
+//            System.out.println(request.getSession());
             return "redirect:/";
 
 
