@@ -23,6 +23,8 @@ import java.util.UUID;
 @Controller
 public class AuthorizeController {
 
+    //重要！！！！！！
+    //JSON.parseObject,把string自动转账为java类对象
     @Autowired //自动加载容器中实例化对象加载到当前上下文中，是不是与前面的Component对应---是的
     private GithubProvider githubProvider;
 
@@ -67,6 +69,7 @@ public class AuthorizeController {
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtModified());
+            user.setAvatarUrl(githubUser.getAvatar_url());//GithubProvider
             userMapper.insert(user);//写入数据库
 
             //响应

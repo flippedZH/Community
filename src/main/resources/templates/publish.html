@@ -27,7 +27,7 @@
                 <span class="sr-only">ZouhengLuntan</span>
 
             </button>
-            <a class="navbar-brand" href="#">ZouhengLuntan</a>
+            <a class="navbar-brand" href="/">ZouhengLuntan</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -79,12 +79,12 @@
             <form action="/publish" method="post">
                 <div class="form-group">
                     <label for="title">问题标题（简单扼要）</label>
-                    <input type="text" class="form-control"  th:value="${title}" id="title" name="title" placeholder="问题标题">
+                    <input type="text" class="form-control"  th:text="${title}" id="title" name="title" placeholder="问题标题">
                 </div>
 
                 <div class="form-group">
                     <label for="description">问题补充（必填，请参考右侧提示）</label>
-                    <!--                            文本输入框,加了class="form-control"，就有了样式哦-->
+                    <!--                            文本输入框,加了class="form-control"，就有了样式哦-->Z
                     <textarea name="description" id="description" class="form-control"  th:text="${description}" cols="30" rows="10"></textarea>
                 </div>
 
@@ -100,6 +100,7 @@
                             <button type="submit" class="btn btn-success btn-publish ">提交</button>
                         </div>
                     </div>
+
                 </div>
             </form>
 
