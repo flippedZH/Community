@@ -44,7 +44,7 @@ public class PaginnationDTO {
             }
         }
         //是否展示上一页
-        if(page==1){
+        if(page==1 || totalPage==0){  //|| totalPage==0是后续加的
             showPrevious=false;
         }else{
             showPrevious=true;
@@ -58,7 +58,7 @@ public class PaginnationDTO {
         }
 
         //是否展示第一页
-        if(pages.contains(1)){
+        if(pages.contains(1)|| totalPage==0){
             showFirstPage=false;
         }else{
             showFirstPage=true;

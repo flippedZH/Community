@@ -9,6 +9,7 @@ import life.majiang.community.model.Question;
 import life.majiang.community.model.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -78,6 +79,7 @@ public class QuestionService {
         }else{
             totalPage=totalCount/size+1;
         }
+
         //判断逻辑：判断是否是页面数据是否正确，避免类似情况：直接在浏览器修改page=-1
         if(page<1){
             page=1;
@@ -85,6 +87,7 @@ public class QuestionService {
         if(page>totalPage){
             page=totalPage;
         }
+
         paginnationDTO.setPagination(totalPage,page);//为了设计逻辑函数往数据模型中传值（加值）
         
         Integer offset=size*(page-1);
@@ -101,6 +104,33 @@ public class QuestionService {
         }
         paginnationDTO.setQuestions(questionDtoList);//赋值
         return paginnationDTO;
+    }
+
+    public QuestionDto getById(Integer id) {
+        Question question =questionMapper.getById(id);
+
+        QuestionDto questionDto=new QuestionDto();
+        BeanUtils.copyProperties(question,questionDto);
+
+        User user = userMapper.findByID(question.getCreator());
+        questionDto.setUser(user);
+
+        return  questionDto;
+    }
+
+    public void createOrUpdate(Question question) {
+         if(question.getId()==null){
+            //创建
+             //gmt_create表示记录创建时间，gmt_modified表示最近修改时间
+             //因为参数这两个需要在一起
+             question.setGmtCreate(System.currentTimeMillis());
+             question.setGmtModified(question.getGmtCreate());
+             questionMapper.create(question);
+         }else{
+             //更新
+             question.setGmtModified(question.getGmtCreate());
+            questionMapper.update(question);
+         }
     }
 }
 

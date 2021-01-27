@@ -3,6 +3,7 @@ import life.majiang.community.dto.AccessTokenDTo;
 import life.majiang.community.dto.GithubUser;
 import life.majiang.community.model.User;
 import life.majiang.community.provider.GithubProvider;
+import life.majiang.community.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.UUID;
 
 //配置路由
@@ -35,9 +38,11 @@ public class AuthorizeController {
     @Value("${github.redirect.uri}")
     private  String redirectUri;
 
-    //@Resource
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
+//    //@Resource
+//    @Autowired
+//    private UserMapper userMapper;
 
     //参数的接收
     @GetMapping("/callback")
@@ -56,35 +61,40 @@ public class AuthorizeController {
         accessTokenDTo.setRedirect_uri(redirectUri);
         accessTokenDTo.setState(state);
 
+//        githubProvider里面有两个类：一是返回Token,另一个返回githubUsers对象
         String accessToken=githubProvider.getAccessToken(accessTokenDTo);
         GithubUser githubUser=githubProvider.getUser(accessToken);
+
         if(githubUser!=null && githubUser.getId()!=null){
             //登录成功 写cookies 和 session
-
             System.out.println("name:"+githubUser.getName());
             User user = new User();
             String token = UUID.randomUUID().toString();
+            //不管数据库是否存在这些值，都需要重新更新，所以放在外面
             user.setToken(token);
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
-            user.setGmtCreate(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtModified());
             user.setAvatarUrl(githubUser.getAvatar_url());//GithubProvider
-            userMapper.insert(user);//写入数据库
+            userService.createOrUpdatae(user);
+//            userMapper.insert(user);//写入数据库
 
-            //响应
+            //响应写入cookie
             response.addCookie(new Cookie("token",token));
-
-            //请求
-            //request.getSession().setAttribute("user",githubUser);
-//            System.out.println("username:"+user.getName());
-//            System.out.println(request.getSession());
             return "redirect:/";
-
 
         }else {
             //登录失败，重新登录
             return "redirect:/";
         }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request,
+                         HttpServletResponse response){
+        request.getSession().removeAttribute("user"); //对应 SessionInterceptor里面的添加 user
+        Cookie cookie=new Cookie("token",null);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        return "redirect:/"; //重定向到首页
     }
 }

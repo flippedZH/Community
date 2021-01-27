@@ -1,7 +1,6 @@
 package life.majiang.community.controller;
 
 import life.majiang.community.dto.PaginnationDTO;
-import life.majiang.community.mapper.UserMapper;
 import life.majiang.community.model.User;
 import life.majiang.community.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,14 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class ProfileController {
-    //注入
-    @Autowired
-    private UserMapper userMapper;
 
     @Autowired
     private QuestionService questionService;
@@ -30,25 +25,14 @@ public class ProfileController {
             @RequestParam(name="page",defaultValue = "1") Integer page,//从页面接收两个参数
             @RequestParam(name="size",defaultValue = "5") Integer size,
                           Model model){
-        User user=null;
-        Cookie[] cookies=request.getCookies();
-        if(cookies!=null&&cookies.length!=0){
-            for(Cookie cookie:cookies){
-                if(cookie.getName().equals("token")){
-                    String token=cookie.getValue();
-                    user=userMapper.findByToken(token);
-                    if(user!=null){
-                        //数据给前端口
-                        request.getSession().setAttribute("user",user);
-                    }
-                    break;
-                }
-            }
-        }
+
+        User user = (User) request.getSession().getAttribute("user");
+
         //profile页面的校验
         if(user==null){
             return "redirect:/";
         }
+
         if("questions".equals(action)){
                 model.addAttribute("section","questions");
                 model.addAttribute("sectionName","我的提问");
