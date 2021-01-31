@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>ZouhengLuntan</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<!--    正式运行时候需要去掉../static/-->
+<!--    <link rel="stylesheet" href="../static/css/bootstrap.min.css">-->
+<!--    <link rel="stylesheet" href="../static/css/bootstrap-theme.min.css">-->
+<!--    <script src="../static/js/bootstrap.min.js" type="application/javascript"></script>-->
+<!--    <link rel="stylesheet" href="../static/css/community.css">-->
+
+
+
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/community.css">
+    <script src="/js/jquery-3.5.1.min.js"></script>
+    <script src="/js/bootstrap.min.js" type="application/javascript"></script>
+
+</head>
+<body>
+<div th:insert="~{navigation :: nav}"></div>
+    <div class="jumbotron">
+        <h1>出错了！</h1>
+        <p th:text="${message}">message没有值，就展示这个</p>
+        <p><a class="btn btn-primary btn-lg" href="#" role="button">回到主页</a></p>
+    </div>
+</body>
+</html>
+
+
+<!--<div class="media">-->
+<!--    <div class="media-left">-->
+<!--        <a href="#">-->
+<!--            <img class="media-object" src="..." alt="...">-->
+<!--        </a>-->
+<!--    </div>-->
+<!--    <div class="media-body">-->
+<!--        <h4 class="media-heading">Media heading</h4>-->
+<!--        ...-->
+<!--    </div>-->
+<!--</div>-->
+
+
+<!--            <ul class="nav navbar-nav navbar-right">-->
+<!--                <li class="dropdown" th:if="${session.user !=null}">-->
+<!--                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"-->
+<!--                       aria-expanded="false" th:text="${session.user.getName()}"><span class="caret"></span></a>-->
+<!--&lt;!&ndash;                <li><a href="https://github.com/login/oauth/authorize?client_id=ac4b3764221afc62cff6&redirect_uri=http://localhost:8887/callback&scope=user&state=1">登录</a></li>&ndash;&gt;-->
+<!--&lt;!&ndash;                <li class="dropdown">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">我 <span class="caret"></span></a>&ndash;&gt;-->
+<!--                </li>-->
+<!--            </ul>-->
