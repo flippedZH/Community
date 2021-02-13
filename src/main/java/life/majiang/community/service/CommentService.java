@@ -4,16 +4,14 @@ import life.majiang.community.dto.CommentDTO;
 import life.majiang.community.enums.CommentTypeEnum;
 import life.majiang.community.exception.CustomizeErrorCode;
 import life.majiang.community.exception.CustomizeException;
-import life.majiang.community.mapper.CommentMapper;
-import life.majiang.community.mapper.QuestionExtMapper;
-import life.majiang.community.mapper.QuestionMapper;
-import life.majiang.community.mapper.UserMapper;
+import life.majiang.community.mapper.*;
 import life.majiang.community.model.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.Notification;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +33,12 @@ public class CommentService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private CommentExtMapper commentExtMapper;
+
+    @Autowired
+    private NotificationMapper notificationMapper;
+
     @Transactional
     public void insert(Comment comment) {
         System.out.println("comment.getParentId():"+comment.getParentId());
@@ -52,10 +56,17 @@ public class CommentService {
             //回复评论
             Comment dbComment=commentMapper.selectByPrimaryKey(comment.getParentId());
             if(dbComment==null){
-                System.out.println("3");
                 throw  new CustomizeException(CustomizeErrorCode.COMMENT_NOT_FOUND);
             }
             commentMapper.insert(comment);
+
+            //增加评论数
+            Comment parentComment = new Comment();
+            parentComment.setId(comment.getParentId());
+            parentComment.setCommentCount(1);
+            //调用了commentExtMapper.xml文件里面调用了commentExtMapper接口,进而可以把参数传到commentExtMapper.xml
+            commentExtMapper.incCommentCount(parentComment);
+
         }
         else {
             //回复问题
@@ -69,12 +80,6 @@ public class CommentService {
             questionExtMapper.incCommentCount(question);
         }
     }
-//    CommentExample commentExample = new CommentExample();
-//        commentExample.createCriteria()
-//                .andParentIdEqualTo(id)
-//                .andTypeEqualTo(CommentTypeEnum.QUESTION.getType());
-//        commentExample.setOrderByClause("gmt_create desc");
-//    List<Comment> comments = commentMapper.selectByExample(commentExample
 
     public List<CommentDTO> listByTargetId(Long id, CommentTypeEnum type) {
         CommentExample commentExample = new CommentExample();

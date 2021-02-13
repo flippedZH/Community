@@ -12,13 +12,17 @@ import life.majiang.community.mapper.UserMapper;
 import life.majiang.community.model.Question;
 import life.majiang.community.model.QuestionExample;
 import life.majiang.community.model.User;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 
 //服务层？？？？？？？    后端？/**/
@@ -56,10 +60,13 @@ public class QuestionService {
         if(page>totalPage){
             page=totalPage;
         }
+
         paginnationDTO.setPagination(totalPage,page);//为了设计逻辑函数往数据模型中传值（加值）
         Integer offset=size*(page-1);
-
-        List<Question> questions=questionMapper.selectByExampleWithRowbounds(new QuestionExample(),new RowBounds(offset,size));//与数据库交互，从数据库中获取到指定数目的数据
+        //问题倒序展示：
+        QuestionExample questionExample = new QuestionExample();
+        questionExample.setOrderByClause("gmt_create desc");
+        List<Question> questions=questionMapper.selectByExampleWithRowbounds(questionExample,new RowBounds(offset,size));//与数据库交互，从数据库中获取到指定数目的数据
         List<QuestionDto> questionDtoList =new ArrayList<>();
 
         for (Question question:questions){
@@ -103,9 +110,9 @@ public class QuestionService {
         paginnationDTO.setPagination(totalPage,page);//为了设计逻辑函数往数据模型中传值（加值）
         
         Integer offset=size*(page-1);
-        //List<Question> questions =questionMapper.listByUserId(userId,offset,size);//与数据库交互，从数据库中获取到指定数目的数据
 
         QuestionExample example = new QuestionExample();
+        //List<Question> questions =questionMapper.listByUserId(userId,offset,size);//与数据库交互，从数据库中获取到指定数目的数据
         example.createCriteria().andCreatorEqualTo(userId);
 
         List<Question> questions=questionMapper.selectByExampleWithRowbounds(example,new RowBounds(offset,size));//与数据库交互，从数据库中获取到指定数目的数据
@@ -191,6 +198,37 @@ public class QuestionService {
 //        questionMapper.updateByExampleSelective(updateQuestion,questionExample);
 
 
+    }
+
+    //直接传入参数DTO 需要获取id、tag等
+    public List<QuestionDto> selectRelated(QuestionDto queryDTO) {
+        //用StringUtils判断是否为空
+        if(StringUtils.isBlank((queryDTO.getTag()))){
+            return  new ArrayList<>();
+        }
+        //数组接收分割之后的标签
+        String[] tags =StringUtils.split(queryDTO.getTag(),',');
+        //字符拼接成正则模式
+        String  regexpTag= Arrays.stream(tags).collect(Collectors.joining("|"));
+        //局部特殊question对象
+        Question question =new Question();
+        question.setId(queryDTO.getId());
+        question.setTag(regexpTag);
+
+        //stream用于集合迭代器的增强
+
+        //利用准备好的question对象从数据库中查找结果
+        List<Question> questions =questionExtMapper.selectRelated(question);
+
+        //map类似迭代器
+        //流操作，完成通用question对象的赋值，并封装成对象列表
+        List<QuestionDto> questionDTOS= questions.stream().map(q->
+        {   QuestionDto questionDto=new QuestionDto();
+            BeanUtils.copyProperties(q,questionDto);
+            return  questionDto;
+        }).collect(Collectors.toList());
+
+        return  questionDTOS;
     }
 }
 

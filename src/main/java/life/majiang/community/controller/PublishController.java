@@ -1,10 +1,12 @@
 package life.majiang.community.controller;
 
+import life.majiang.community.cache.TagCache;
 import life.majiang.community.dto.QuestionDto;
 import life.majiang.community.mapper.QuestionMapper;
 import life.majiang.community.model.Question;
 import life.majiang.community.model.User;
 import life.majiang.community.service.QuestionService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,11 +32,13 @@ public class PublishController {
         model.addAttribute("description",question.getDescription());
         model.addAttribute("tag",question.getTag());
         model.addAttribute("id",question.getId());//用于唯一标识问题，去判断是更新还是创建问题
+
         return "publish";
     }
 
     @GetMapping("/publish")  //Get返回页面
-    public String publish() {
+    public String publish(Model model) {
+        model.addAttribute("tags",TagCache.get());
         return "publish";
     }
 
@@ -64,6 +68,12 @@ public class PublishController {
         if(tag==null||tag==""){
             model.addAttribute("error","标签不能为空");
             return "publish";
+        }
+
+        String invalid=TagCache.filterInvalid(tag);
+        if(StringUtils.isNotBlank(invalid)){
+            model.addAttribute("error","非法标签"+invalid);
+            return  "publish";
         }
 
         //?

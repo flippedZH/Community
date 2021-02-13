@@ -5,6 +5,7 @@ import life.majiang.community.dto.QuestionDto;
 
 
 import life.majiang.community.enums.CommentTypeEnum;
+import life.majiang.community.model.Question;
 import life.majiang.community.service.CommentService;
 import life.majiang.community.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class QuestionController {
         System.out.println("test:"+id);
         QuestionDto questionDTO=questionService.getById(id);
 
+        List<QuestionDto> relatedQuestions =questionService.selectRelated(questionDTO);
+
         //list泛型
         List<CommentDTO> comments=commentService.listByTargetId(id, CommentTypeEnum.QUESTION);
 
@@ -39,6 +42,7 @@ public class QuestionController {
         questionService.incView(id);
         model.addAttribute("question",questionDTO);
         model.addAttribute("comments",comments);
+        model.addAttribute("relatedQuestions",relatedQuestions);
         return "question";
     }
 }
