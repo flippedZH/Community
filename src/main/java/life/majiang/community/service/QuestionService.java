@@ -77,7 +77,7 @@ public class QuestionService {
             questionDto.setUser(user);
             questionDtoList.add(questionDto);
         }
-        paginnationDTO.setQuestions(questionDtoList);//赋值
+        paginnationDTO.setData(questionDtoList);//赋值
         return paginnationDTO;
     }
 
@@ -126,7 +126,7 @@ public class QuestionService {
             questionDto.setUser(user);
             questionDtoList.add(questionDto);
         }
-        paginnationDTO.setQuestions(questionDtoList);//赋值
+        paginnationDTO.setData(questionDtoList);//赋值
         return paginnationDTO;
     }
 

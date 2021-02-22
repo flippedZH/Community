@@ -25,7 +25,7 @@ public class IndexController {
                          @RequestParam(name="size",defaultValue = "5") Integer size
     ){
         PaginnationDTO pagination=questionService.list(page,size); //驱动式编程，快速修复 ALT+回车
-        System.out.println("问题："+pagination.getQuestions());
+
         model.addAttribute("pagination",pagination);//通过model向前段注入数据 questions
         return "index";//从模板目录里面找的（templaes）
     }

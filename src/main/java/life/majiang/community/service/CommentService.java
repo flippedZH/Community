@@ -2,6 +2,8 @@ package life.majiang.community.service;
 
 import life.majiang.community.dto.CommentDTO;
 import life.majiang.community.enums.CommentTypeEnum;
+import life.majiang.community.enums.NotificationTypeEnum;
+import life.majiang.community.enums.NotificationStatusEnum;
 import life.majiang.community.exception.CustomizeErrorCode;
 import life.majiang.community.exception.CustomizeException;
 import life.majiang.community.mapper.*;
@@ -11,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.management.Notification;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,16 +41,15 @@ public class CommentService {
     private NotificationMapper notificationMapper;
 
     @Transactional
-    public void insert(Comment comment) {
-        System.out.println("comment.getParentId():"+comment.getParentId());
+    public void insert(Comment comment, User commentator) {
+
         if(comment.getParentId()==null || comment.getParentId()==0){
             //怎么 把消息从内层抛出到controller呢？---通过之前自定义的Exception抛出（code码）
-            System.out.println("1");
+
             throw new CustomizeException(CustomizeErrorCode.TARGET_PARAM_NOT_FOUND);
         }
-        System.out.println("comment.getType()"+comment.getType());
         if(comment.getType()==null|| !CommentTypeEnum.isExist(comment.getType())){
-            System.out.println("2");
+
             throw new CustomizeException(CustomizeErrorCode.TYPE_PARAM_WRONG);
         }
         if(comment.getType()==CommentTypeEnum.COMMENT.getType()){
@@ -58,27 +58,66 @@ public class CommentService {
             if(dbComment==null){
                 throw  new CustomizeException(CustomizeErrorCode.COMMENT_NOT_FOUND);
             }
+            //回复问题
+            Question question =questionMapper.selectByPrimaryKey( dbComment.getParentId());
+            if(question==null){
+
+                throw  new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            }
+            //INTEGER类型模型默认初始化的时候为null,尽管数据库default=0
+            comment.setCommentCount(0);
             commentMapper.insert(comment);
 
-            //增加评论数
+            //增加子评论数
             Comment parentComment = new Comment();
             parentComment.setId(comment.getParentId());
             parentComment.setCommentCount(1);
             //调用了commentExtMapper.xml文件里面调用了commentExtMapper接口,进而可以把参数传到commentExtMapper.xml
             commentExtMapper.incCommentCount(parentComment);
 
+            //CTRL+ALT+M：抽取方法
+            //创建通知
+            createNotify(comment,dbComment.getCommentator(), commentator.getName(),
+                    commentator.getName(), NotificationTypeEnum.REPLY_COMMENT,question.getId());
         }
         else {
             //回复问题
             Question question =questionMapper.selectByPrimaryKey(comment.getParentId());
             if(question==null){
-                System.out.println("4");
                 throw  new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
             }
+            //增加父级评论数
+            //INTEGER类型模型默认初始化的时候为null,尽管数据库default=0
+            comment.setCommentCount(0);
+            //insert之前
             commentMapper.insert(comment);
             question.setCommentCount(1);
             questionExtMapper.incCommentCount(question);
+            //创建通知
+            createNotify(comment,question.getCreator(),commentator.getName(),
+                    question.getTitle(), NotificationTypeEnum.REPLY_QUESTION,question.getId());
         }
+    }
+
+    private void createNotify(Comment comment, Long receiver, String notifierName,String outerTitle,
+                              NotificationTypeEnum notificationType,Long outerId) {
+        //通知
+        Notification notification =new Notification();
+        //创建时间
+        notification.setGmtCreate(System.currentTimeMillis());
+        //通知类型 ：回复了评论还是问题
+        notification.setType(notificationType.getType());
+        //回复对应问题的ID
+        notification.setOuterid(outerId);
+        //通知创建者,也就是评论人
+        notification.setNotifier(comment.getCommentator());
+        //通知阅读状态
+        notification.setStatus(NotificationStatusEnum.UNREAD.getStatus());
+        //就是从数据库中通过parentId查询到评论的评论人
+        notification.setReceiver(receiver);
+        notification.setNotifierName(notifierName);
+        notification.setOuterTitle(outerTitle);
+        notificationMapper.insert(notification);
     }
 
     public List<CommentDTO> listByTargetId(Long id, CommentTypeEnum type) {

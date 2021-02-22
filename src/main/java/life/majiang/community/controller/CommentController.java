@@ -49,7 +49,7 @@ public class CommentController {
         comment.setGmtModified(System.currentTimeMillis());
         comment.setCommentator(user.getId()); //这里注意一下！核对一下源代码
         comment.setLikeCount(0L);
-        commentService.insert(comment);
+        commentService.insert(comment,user);
 //        Map<Object,Object> objectObjectHashMap =new HashMap<>();
 //        objectObjectHashMap.put("messsage","成功");
         return  ResultDTO.okOf();//直接返回对象
