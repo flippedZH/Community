@@ -23,7 +23,6 @@ public class NotificationController {
         User user = (User) request.getSession().getAttribute("user");
 
         if (user == null) {
-            System.out.println("跳转测试："+1);
             return "redirect:/";
         }
 
@@ -32,12 +31,10 @@ public class NotificationController {
                 || NotificationTypeEnum.REPLY_QUESTION.getType() == notificationDTO.getType()
                 ) {
 //            || NotificationTypeEnum.THUMB_COMMENT.getType() == notificationDTO.getType()
-            System.out.println("跳转测试："+2);
-            System.out.println("notification:"+notificationDTO);
             return "redirect:/question/" + notificationDTO.getOuterid();
 
         } else {
-            System.out.println("跳转测试："+3);
+
             return "redirect:/";
         }
 

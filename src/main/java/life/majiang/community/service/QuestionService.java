@@ -81,7 +81,7 @@ public class QuestionService {
         return paginnationDTO;
     }
 
-    //通过用户id查找到的问题的数据模型:实现我的问题功能
+    //通过用户id查找到的问题的数据模型:实现我的问题功能  目的是为了列表化展示我的问题
     public PaginnationDTO list(Long userId, Integer page, Integer size) {
         
         PaginnationDTO paginnationDTO =new PaginnationDTO();

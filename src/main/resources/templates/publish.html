@@ -4,19 +4,24 @@
     <title>发布</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <!--    正式运行时候需要去掉../static/-->
-    <!--    <link rel="stylesheet" href="../static/css/bootstrap.min.css">-->
-    <!--    <link rel="stylesheet" href="../static/css/bootstrap-theme.min.css">-->
-    <!--    <link rel="stylesheet" href="../static/css/community.css">-->
-    <!--    <script src="../static/js/bootstrap.min.js" type="application/javascript"></script>-->
-
-
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="/css/community.css">
+    <link rel="stylesheet" href="/css/editormd.css">
+<!--    <link rel="stylesheet" href="//at.alicdn.com/t/font_1758372_iu83tgg8gw.css">-->
+<!--    <script src="/js/plugins/image-dialog/image-dialog.js" ></script>-->
+    <script src="/js/image-dialog/image-dialog.js" ></script>
     <script src="/js/jquery-3.5.1.min.js"></script>
-    <script src="/js/community.js"></script>
+<!--    <script src="/js/bootstrap.min.js" ></script>-->
+<!--    <script src="/js/community.js"  ></script>-->
+<!--    <script src="/js/editormd.min.js" ></script>-->
+
+<!--    <script src="/js/jquery-3.4.1.min.js"></script>-->
     <script src="/js/bootstrap.min.js" type="application/javascript"></script>
+    <script src="/js/community.js" type="application/javascript"></script>
+    <script src="/js/editormd.min.js" type="application/javascript"></script>
+
+
 
 
 </head>
@@ -36,12 +41,30 @@
                            placeholder="问题标题" autocomplete="off">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="question-editor">
                     <label for="description">问题补充（必填，请参考右侧提示）</label>
                     <!--                            文本输入框,加了class="form-control"，就有了样式哦-->Z
-                    <textarea name="description" id="description" class="form-control" th:text="${description}"
-                              cols="30" rows="10"></textarea>
+                    <textarea name="description" id="description" class="form-control"  style="display:none;"
+                              th:text="${description}"
+                              cols="30"
+                              rows="10"></textarea>
                 </div>
+                <script type="text/javascript">
+                    $(function() {
+                        var editor = editormd("question-editor", {
+                            width  : "100%",
+                            height : 350,
+                            path   : "/js/lib/",
+                            delay  : 0,
+                            watch  : false,
+                            placeholder : "请输入内容",
+                            imageUpload    : true,
+                            imageFormats   : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                            imageUploadURL : "/file/upload",
+                        });
+                    });
+                </script>
+
                 <!--标签-->
                 <div class="form-group">
                     <label for="tag">添加标签</label>
@@ -100,5 +123,6 @@
         </div>
     </div>
 </div>
+<div th:insert="~{footer :: foot}"></div>
 </body>
 </html>

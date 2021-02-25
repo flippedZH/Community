@@ -30,7 +30,7 @@ public class NotificationService {
     @Autowired
     private UserMapper userMapper;
 
-    //通知的分页函数
+    //通知的分页函数 返回分页后的通知DTO  目的是列表化展示我的通知
     public PaginnationDTO list(Long userId, Integer page, Integer size) {
 
         PaginnationDTO<NotificationDTO> paginnationDTO =new PaginnationDTO();
@@ -47,7 +47,6 @@ public class NotificationService {
         }else{
             totalPage=totalCount/size+1;
         }
-
         //判断逻辑：判断是否是页面数据是否正确，避免类似情况：直接在浏览器修改page=-1
         if(page<1){
             page=1;
@@ -55,45 +54,42 @@ public class NotificationService {
         if(page>totalPage){
             page=totalPage;
         }
-
+        //setPagination为自己写的分页逻辑函数
         paginnationDTO.setPagination(totalPage,page);//为了设计逻辑函数往数据模型中传值（加值）
-
         Integer offset=size*(page-1);
-
+        //数据库查询
         NotificationExample example = new NotificationExample();
-        //List<Question> questions =questionMapper.listByUserId(userId,offset,size);//与数据库交互，从数据库中获取到指定数目的数据
         example.createCriteria().andReceiverEqualTo(userId);
-        List<Notification> notifications=notificationMapper.selectByExampleWithRowbounds(example,new RowBounds(offset,size));//与数据库交互，从数据库中获取到指定数目的数据
-
+        //按照时间倒序排序
+        example.setOrderByClause("gmt_create desc");
+        //与数据库交互，从数据库中获取到指定数目的数据 完成分页
+        //org.mybatis.generator.plugins.RowBoundsPlugin分页插件
+        List<Notification> notifications=notificationMapper.selectByExampleWithRowbounds(example,new RowBounds(offset,size));
         if(notifications.size()==0){
             return  paginnationDTO;
         }
 
-//        Set<Long> disUserIds=notifications.stream().map(notify-> notify.getNotifier()).collect(Collectors.toSet());
-//        List<Long> userIds=new ArrayList<>(disUserIds);
-//        UserExample userExample=new UserExample();
-//        userExample.createCriteria().andIdIn(userIds);
-//        List<User> users=userMapper.selectByExample(userExample);
-//        Map<Long,User> userMap=users.stream().collect(Collectors.toMap(u->u.getId(), u->u));
-
+        //创建通知列表
+        //属性copy并设置typeName
         List<NotificationDTO> notificationDTOS =new ArrayList<>();
-
         for (Notification notification : notifications) {
-            System.out.println("notifications:"+notification);
             NotificationDTO notificationDTO = new NotificationDTO();
             BeanUtils.copyProperties(notification, notificationDTO);
-
+            //就是给type定义了一个中文名字，就是用枚举赋值
             notificationDTO.setTypeName(NotificationTypeEnum.nameOfType(notification.getType()));
             notificationDTOS.add(notificationDTO);
         }
-
         paginnationDTO.setData(notificationDTOS);
+
         return paginnationDTO;
     }
 
+
     public Long unreadCount(Long userId) {
         NotificationExample notificationExample =new NotificationExample();
+        //通过拼接，连接数据库查询条件
         notificationExample.createCriteria().andReceiverEqualTo(userId).andStatusEqualTo(NotificationStatusEnum.UNREAD.getStatus());
+        //countByExample表示通过条件计数？
         return notificationMapper.countByExample(notificationExample);
     }
 

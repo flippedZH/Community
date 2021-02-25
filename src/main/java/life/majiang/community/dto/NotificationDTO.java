@@ -11,6 +11,7 @@ public class NotificationDTO {
     private Long id;
     private Long gmtCreate;
     private Integer status;
+    //user可以不要
     private User user;
     private Long notifier;
     private Long outerid;
