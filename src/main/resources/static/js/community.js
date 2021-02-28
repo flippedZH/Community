@@ -25,7 +25,7 @@ function comment2target(targetId,type,content){
                 //确定
                 if (isAccepted) {
                     //登录地址
-                    window.open("https://github.com/login/oauth/authorize?client_id=ac4b3764221afc62cff6&redirect_uri=http://localhost:8887/callback&scope=user&state=1")
+                    window.open("https://github.com/login/oauth/authorize?client_id=ac4b3764221afc62cff6&redirect_uri=http://120.25.171.3/callback&scope=user&state=1")
                     //确认登录时存一个key value
                     //存入浏览器中
                     window.localStorage.setItem("closable", true);
