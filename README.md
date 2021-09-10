@@ -1,6 +1,4 @@
-# Community
-Community Repo
-## Autodidact社区
+## ZouhengLuntan
 ## 实现的功能和技术
 - 采用SpringMVC架构处理请求，业务处理，以及Thymeleaf模板引擎实现页面显示。
 - 采用Cookie存储验证码、浏览历史信息，以及Session存储用户数据。
